@@ -6,6 +6,7 @@ import {
   Inject,
   Param,
   Post,
+  Logger,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -13,12 +14,15 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 @ApiTags('AI')
 @Controller('ai')
 export class AiController {
+  private readonly logger = new Logger(AiController.name);
   constructor(@Inject('AI_SERVICE') private readonly aiClient: ClientProxy) {}
 
   @Get('health')
   @ApiOperation({ summary: 'Check AI Service health' })
   @ApiResponse({ status: 200, description: 'AI Service is up and running.' })
   checkHealth() {
+    this.logger.log('Publishing to AI_SERVICE: health_check');
+    this.logger.log('Subscribing to AI_SERVICE response');
     return this.aiClient.send({ cmd: 'health_check' }, {});
   }
 
@@ -26,6 +30,8 @@ export class AiController {
   @ApiOperation({ summary: 'Chat with AI' })
   @ApiResponse({ status: 201, description: 'Message processed.' })
   chat(@Body() body: { message: string; projectId?: string }) {
+    this.logger.log('Publishing to AI_SERVICE: chat');
+    this.logger.log('Subscribing to AI_SERVICE response');
     return this.aiClient.send({ cmd: 'chat' }, body);
   }
 
@@ -36,6 +42,8 @@ export class AiController {
     @Param('sourceType') sourceType: string,
     @Param('sourceId') sourceId: string,
   ) {
+    this.logger.log('Publishing to AI_SERVICE: get_context');
+    this.logger.log('Subscribing to AI_SERVICE response');
     return this.aiClient.send({ cmd: 'get_context' }, { sourceId, sourceType });
   }
 
@@ -45,6 +53,8 @@ export class AiController {
   upsertContext(
     @Body() body: { sourceId: string; sourceType: string; content: string },
   ) {
+    this.logger.log('Publishing to AI_SERVICE: upsert_context');
+    this.logger.log('Subscribing to AI_SERVICE response');
     return this.aiClient.send({ cmd: 'upsert_context' }, body);
   }
 
@@ -52,6 +62,8 @@ export class AiController {
   @ApiOperation({ summary: 'Delete AI context' })
   @ApiResponse({ status: 200, description: 'Context deleted.' })
   deleteContext(@Param('id') id: string) {
+    this.logger.log('Publishing to AI_SERVICE: delete_context');
+    this.logger.log('Subscribing to AI_SERVICE response');
     return this.aiClient.send({ cmd: 'delete_context' }, { id });
   }
 }

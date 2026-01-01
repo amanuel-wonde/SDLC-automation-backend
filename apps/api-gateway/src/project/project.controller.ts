@@ -9,6 +9,7 @@ import {
   Post,
   Request,
   UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -32,6 +33,7 @@ import {
 @UseGuards(JwtAuthGuard)
 @Controller('projects')
 export class ProjectController {
+  private readonly logger = new Logger(ProjectController.name);
   constructor(
     @Inject('PROJECT_SERVICE') private readonly projectClient: ClientProxy,
   ) {}
@@ -41,6 +43,8 @@ export class ProjectController {
   @ApiOperation({ summary: 'Create a new project' })
   @ApiResponse({ status: 201, description: 'Project created successfully.' })
   createProject(@Request() req, @Body() dto: CreateProjectDto) {
+    this.logger.log('Publishing to PROJECT_SERVICE: create_project');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'create_project' },
       { userId: req.user.sub, dto },
@@ -51,6 +55,8 @@ export class ProjectController {
   @ApiOperation({ summary: 'Get all projects for the authenticated user' })
   @ApiResponse({ status: 200, description: 'Projects retrieved successfully.' })
   getUserProjects(@Request() req) {
+    this.logger.log('Publishing to PROJECT_SERVICE: get_user_projects');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'get_user_projects' },
       { userId: req.user.sub },
@@ -63,6 +69,8 @@ export class ProjectController {
   @ApiResponse({ status: 404, description: 'Project not found.' })
   @ApiResponse({ status: 403, description: 'Access denied.' })
   getProject(@Request() req, @Param('id') projectId: string) {
+    this.logger.log('Publishing to PROJECT_SERVICE: get_project');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'get_project' },
       { projectId, userId: req.user.sub },
@@ -78,6 +86,8 @@ export class ProjectController {
     @Param('id') projectId: string,
     @Body() dto: UpdateProjectDto,
   ) {
+    this.logger.log('Publishing to PROJECT_SERVICE: update_project');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'update_project' },
       { projectId, userId: req.user.sub, dto },
@@ -89,6 +99,8 @@ export class ProjectController {
   @ApiResponse({ status: 200, description: 'Project deleted successfully.' })
   @ApiResponse({ status: 403, description: 'Only owner can delete.' })
   deleteProject(@Request() req, @Param('id') projectId: string) {
+    this.logger.log('Publishing to PROJECT_SERVICE: delete_project');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'delete_project' },
       { projectId, userId: req.user.sub },
@@ -105,6 +117,8 @@ export class ProjectController {
     @Param('id') projectId: string,
     @Body() dto: AddMemberDto,
   ) {
+    this.logger.log('Publishing to PROJECT_SERVICE: add_member');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'add_member' },
       { projectId, userId: req.user.sub, dto },
@@ -115,6 +129,8 @@ export class ProjectController {
   @ApiOperation({ summary: 'Get project members' })
   @ApiResponse({ status: 200, description: 'Members retrieved successfully.' })
   getMembers(@Request() req, @Param('id') projectId: string) {
+    this.logger.log('Publishing to PROJECT_SERVICE: get_members');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'get_members' },
       { projectId, userId: req.user.sub },
@@ -134,6 +150,8 @@ export class ProjectController {
     @Param('userId') targetUserId: string,
     @Body() dto: UpdateMemberRoleDto,
   ) {
+    this.logger.log('Publishing to PROJECT_SERVICE: update_member_role');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'update_member_role' },
       { projectId, targetUserId, requesterId: req.user.sub, dto },
@@ -149,6 +167,8 @@ export class ProjectController {
     @Param('id') projectId: string,
     @Param('userId') targetUserId: string,
   ) {
+    this.logger.log('Publishing to PROJECT_SERVICE: remove_member');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'remove_member' },
       { projectId, targetUserId, requesterId: req.user.sub },
@@ -164,6 +184,8 @@ export class ProjectController {
     @Param('id') projectId: string,
     @Body() dto: CreateTaskDto,
   ) {
+    this.logger.log('Publishing to PROJECT_SERVICE: create_task');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'create_task' },
       { projectId, userId: req.user.sub, dto },
@@ -174,6 +196,8 @@ export class ProjectController {
   @ApiOperation({ summary: 'Get all tasks in project' })
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully.' })
   getProjectTasks(@Request() req, @Param('id') projectId: string) {
+    this.logger.log('Publishing to PROJECT_SERVICE: get_project_tasks');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'get_project_tasks' },
       { projectId, userId: req.user.sub },
@@ -186,6 +210,7 @@ export class ProjectController {
 @UseGuards(JwtAuthGuard)
 @Controller('tasks')
 export class TaskController {
+  private readonly logger = new Logger(TaskController.name);
   constructor(
     @Inject('PROJECT_SERVICE') private readonly projectClient: ClientProxy,
   ) {}
@@ -198,6 +223,8 @@ export class TaskController {
     @Param('id') taskId: string,
     @Body() dto: UpdateTaskDto,
   ) {
+    this.logger.log('Publishing to PROJECT_SERVICE: update_task');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'update_task' },
       { taskId, userId: req.user.sub, dto },
@@ -208,6 +235,8 @@ export class TaskController {
   @ApiOperation({ summary: 'Delete task' })
   @ApiResponse({ status: 200, description: 'Task deleted successfully.' })
   deleteTask(@Request() req, @Param('id') taskId: string) {
+    this.logger.log('Publishing to PROJECT_SERVICE: delete_task');
+    this.logger.log('Subscribing to PROJECT_SERVICE response');
     return this.projectClient.send(
       { cmd: 'delete_task' },
       { taskId, userId: req.user.sub },
