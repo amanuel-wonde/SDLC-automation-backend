@@ -1,0 +1,44 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../../node_modules/@prisma/client-ai"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model AiConversation {
+    id        String   @id @default(uuid())
+    userId    String
+    projectId String? // Optional: Context of the conversation
+    title     String? // Auto-generated summary of the chat
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    messages AiMessage[]
+
+    @@map("ai_conversations")
+}
+
+model AiMessage {
+    id             String   @id @default(uuid())
+    conversationId String
+    role           String // "user" | "assistant" | "system"
+    content        String
+    createdAt      DateTime @default(now())
+
+    conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+    @@map("ai_messages")
+}
+
+// Simple Context Storage
+model AiContext {
+    id         String @id @default(uuid())
+    sourceId   String // ProjectID or TaskID
+    sourceType String // "PROJECT" | "TASK"
+    content    String // Text content available for the AI to "read"
+
+    @@unique([sourceId, sourceType])
+    @@map("ai_contexts")
+}
